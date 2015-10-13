@@ -141,10 +141,13 @@ def fetch_actions_for_activity_page(team, tab, page, params):
     )
     return list(action_qs)
 
-@team_view
+@public_team_view
 def videos(request, team):
     if team.is_old_style():
         return old_views.detail(request, team)
+
+    if not team.user_is_member(request.user):
+        raise Http404
 
     filters_form = forms.VideoFiltersForm(team, request.GET)
     if filters_form.is_bound and filters_form.is_valid():
